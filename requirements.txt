@@ -1,0 +1,6 @@
+setuptools
+numpy
+pandas
+pyarrow
+s3fs
+python-dotenv
