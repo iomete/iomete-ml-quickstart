@@ -43,8 +43,6 @@ We use a custom Dockerfile that optimizes the Spark environment. Run the followi
 make docker-push
 ```
 
----
-
 ## 🚀 Deploying to IOMETE
 
 Follow these steps to configure and launch your PySpark job on the IOMETE platform:
