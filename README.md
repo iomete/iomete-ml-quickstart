@@ -27,7 +27,7 @@ Before you begin, ensure you have:
 Clone the repository and prepare your environment variables:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/iomete/iomete-ml-quickstart.git
 cd iomete-ml-quickstart
 cp .env.example .env
 
@@ -42,8 +42,6 @@ We use a custom Dockerfile that optimizes the Spark environment. Run the followi
 ```bash
 make docker-push
 ```
-
-Here are the deployment steps, rewritten for clarity while strictly maintaining your original order for the configuration fields.
 
 ---
 
@@ -82,6 +80,6 @@ Fill in the template details in the following order:
 ## 📁 Repository Structure
 
 * `main.py`: The PySpark ML training script.
-* `Dockerfile`: Multi-stage build using `uv` and virtual environments.
+* `Dockerfile`: Using `uv` and virtual environments.
 * `requirements.txt`: Python dependencies (Numpy, Pandas, etc.).
 * `Makefile`: Shortcuts for Docker operations.
