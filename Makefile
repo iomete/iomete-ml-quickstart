@@ -4,6 +4,11 @@ ifneq (,$(wildcard .env))
   export
 endif
 
+.PHONY: run
+run:
+	echo $$IMAGE
+	echo $$TAG
+
 .PHONY: docker-push
 docker-push:
 	docker buildx build \

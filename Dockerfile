@@ -18,7 +18,7 @@ ENV PYSPARK_PYTHON="/opt/venv/bin/python"
 ENV PYSPARK_DRIVER_PYTHON="/opt/venv/bin/python"
 
 # install python dependencies into the venv using requirements.txt
-COPY requirements.txt /tmp/requirements.txt
+COPY infra/requirements.txt /tmp/requirements.txt
 RUN uv pip install --python /opt/venv/bin/python -r /tmp/requirements.txt
 
 # ensure the spark user owns the venv so it can execute scripts
@@ -30,5 +30,5 @@ USER spark
 # switch to app directory
 WORKDIR /app
 
-# use chown to ensure spark user owns the main.py file 
-COPY --chown=spark:spark main.py /app/main.py
+# use chown to ensure spark user owns the job.py file 
+COPY --chown=spark:spark job.py /app/job.py
