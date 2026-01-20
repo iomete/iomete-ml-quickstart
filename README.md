@@ -103,11 +103,10 @@ Similar code is provided in the `comparison/` folder to compare single-node vs d
 
 Here are some statistics from running the comparison on synthetically generated data with 3 feature columns:
 
-| Dataset Size | Single-node Training Time | Distributed Training Time (4 Executors) |
+| Dataset Size | Single-node Training Time | Distributed Training Time |
 |--------------|---------------------------|------------------------------------------|
 | 1 Million Rows | ~26.97 seconds | ~2 minutes 49 seconds|
 | 10 Million Rows | OOM Killed | ~8 minutes 52 seconds|
-| 100 Million Rows | OOM Killed | ~90 minutes Estimate|
 
 ## Some Stats from Distributed Training on 10 Million Rows
 
