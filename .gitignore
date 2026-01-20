@@ -5,9 +5,14 @@ build/
 dist/
 wheels/
 *.egg-info
+.DS_Store
 
 # Virtual environments
 .venv
 .env
 .python-version
 pyproject.toml
+
+# comparison/
+comparison/local.sh
+comparison/*.csv
