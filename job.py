@@ -52,7 +52,7 @@ def main():
     # path = f"s3a://{MY_BUCKET}/{MY_CSV_FILE}"
     # df = spark.read.option("header", "true").option("inferSchema", "true").csv(path)
     print("Generating synthetic data...")
-    df = generate_spark_data(spark, rows=10_000_000)
+    df = generate_spark_data(spark)
     print("Data generation complete.")
     FEATURE_COLS = ["feature_col1", "feature_col2", "feature_col3"]
     MY_RESPONSE = "target_col"
@@ -72,6 +72,9 @@ def main():
             col(MY_RESPONSE) \
                 .alias("label")
         )
+    
+    # Repartition data for better parallelism
+    df_ml = df_ml.repartition(120)
 
     # ---- TRAIN/TEST SPLIT (80-20) - Spark way ----
     print("Splitting data into Train and Test sets...")

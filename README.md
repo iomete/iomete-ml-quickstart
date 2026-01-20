@@ -93,9 +93,31 @@ Once the job is submitted, you can monitor the training progress in various ways
 3. Check the **Logs** directly  on **IOMETE console** to view the training logs and any potential errors.
 
 -- 
+## ⚡ Performance Comparison: Single-node vs Distributed Training
 
-## Comparsion Results
+Similar code is provided in the `comparison/` folder to compare single-node vs distributed training times. 
 
-Similar code is provided in the `comparison/` folder to compare single-node vs distributed training times.
+|Singe-node Machine | Distributed Spark Cluster |
+|-------------------|-----------------------------------------------------------|
+| 10 CPU, 24GB RAM | 20 Executors, each with 2 CPU, 8GB RAM = 40 CPU, 160GB RAM |
 
-To validate the performance of distributed training using PySpark on IOMETE, we compared the training time of  model on a synthetic dataset of 1 million rows and 1 feature, using both single-node and distributed training approaches.
+Here are some statistics from running the comparison on synthetically generated data with 3 feature columns:
+
+| Dataset Size | Single-node Training Time | Distributed Training Time (4 Executors) |
+|--------------|---------------------------|------------------------------------------|
+| 1 Million Rows | ~26.97 seconds | ~2 minutes 49 seconds|
+| 10 Million Rows | OOM Killed | ~8 minutes 52 seconds|
+| 100 Million Rows | OOM Killed | ~90 minutes Estimate|
+
+## Some Stats from Distributed Training on 10 Million Rows
+
+### Training Metrics Output:
+![Distributed Training Spark UI - Stages](images/results.png)
+
+### CPU and Memory Utilization:
+![Distributed Training Spark UI](images/cpu-memory.png)
+
+### Executor Metrics:
+![Distributed Training Spark UI - Executors](images/executors1.png)
+![Distributed Training Spark UI - Executors 2](images/executors2.png)
+![Distributed Training Spark UI - Executors 3](images/executors3.png)
