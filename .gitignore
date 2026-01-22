@@ -13,6 +13,8 @@ wheels/
 .python-version
 pyproject.toml
 
-# comparison/
-comparison/local.sh
-comparison/*.csv
+# comparison code
+comparison
+
+# images
+doc/images/

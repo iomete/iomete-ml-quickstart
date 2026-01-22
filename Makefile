@@ -1,23 +1,20 @@
-# Load .env file
-ifneq (,$(wildcard .env))
-  include .env
-  export
-endif
+docker_image := iomete/sample-job
+docker_tag := 1.0.0
 
-.PHONY: run
-run:
-	echo $$IMAGE
-	echo $$TAG
+install-requirements:
+	pip install -r infra/requirements.txt
 
-.PHONY: docker-push
+run-job:
+	python job.py
+	
+docker-build:
+	# Run this for one time: docker buildx create --use
+	docker build -f infra/Dockerfile -t ${docker_image}:${docker_tag} .
+	@echo ${docker_image}
+	@echo ${docker_tag}
+
 docker-push:
-	docker buildx build \
-		--platform linux/amd64,linux/arm64 \
-		--push \
-		-f Dockerfile \
-		-t ${IMAGE}:${TAG} \
-		. \
-		--sbom=true \
-		--provenance=true
-	@echo ${IMAGE}
-	@echo ${TAG}
+	# Run this for one time: docker buildx create --use
+	docker buildx build --platform linux/amd64,linux/arm64 --push -f infra/Dockerfile -t ${docker_image}:${docker_tag} .
+	@echo ${docker_image}
+	@echo ${docker_tag}

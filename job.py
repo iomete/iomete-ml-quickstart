@@ -7,6 +7,9 @@ from pyspark.ml.regression import RandomForestRegressor
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
+from dotenv import load_dotenv
+
+load_dotenv()
 
 start_time = time.time()
 
@@ -14,7 +17,7 @@ start_time = time.time()
 # MY_CSV_FILE = os.getenv("MY_CSV_FILE")
 
 
-def generate_spark_data(spark, rows=10_000_000):
+def generate_spark_data(spark, rows=100):
     print(f"Generating {rows} rows across the cluster...")
 
     # 1. Create an empty DataFrame with the desired number of rows
@@ -52,7 +55,7 @@ def main():
     # path = f"s3a://{MY_BUCKET}/{MY_CSV_FILE}"
     # df = spark.read.option("header", "true").option("inferSchema", "true").csv(path)
     print("Generating synthetic data...")
-    df = generate_spark_data(spark)
+    df = generate_spark_data(spark) 
     print("Data generation complete.")
     FEATURE_COLS = ["feature_col1", "feature_col2", "feature_col3"]
     MY_RESPONSE = "target_col"
@@ -74,7 +77,7 @@ def main():
         )
     
     # Repartition data for better parallelism
-    df_ml = df_ml.repartition(120)
+    df_ml = df_ml.repartition(10)
 
     # ---- TRAIN/TEST SPLIT (80-20) - Spark way ----
     print("Splitting data into Train and Test sets...")
