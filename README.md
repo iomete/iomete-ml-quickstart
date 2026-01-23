@@ -1,83 +1,91 @@
 # PySpark Machine Learning on IOMETE
 
-This repository provides a production-ready template for training Machine Learning models on the **IOMETE Lakehouse platform**. It features a high-performance Docker setup using `uv` for lightning-fast dependency management and `PySpark` for scalable linear regression.
+This repository contains a production-ready template for distributed **Machine Learning training** using PySpark on the IOMETE Lakehouse.
 
-## 🚀 Key Features
+Repo contains a spark job that you can deploy directly to IOMETE clusters. For more details on deploying spark jobs to IOMETE, refer to documentation [here](https://iomete.com/resources/developer-guide/spark-job/getting-started/).
 
-* **Optimized Build:** Uses `uv` for 10x faster Python package installation than standard `pip`.
-* **Isolated Environment:** Implements a Python Virtual Environment (`venv`) to ensure compatibility with Spark 3.5.x and Python 3.12+.
-* **IOMETE Integration:** Pre-configured to run seamlessly on IOMETE Spark clusters.
+## 🧠 ML Capabilities
 
----
+The included `job.py` provides a scalable **Random Forest** pipeline that includes **Distributed Training**, i.e., training models across multiple Spark executors. It is purposefully designed to be a starting point for more complex ML workflows. You can easily extend it to include:
 
-## 🛠 Prerequisites
-
-Before you begin, ensure you have:
-
-1. An active **IOMETE** account. 
-2. **Docker** installed and authenticated to your container registry (e.g., ACR, Docker Hub).
-3. `make` installed (optional, for using the Makefile).
+* Feature Engineering (e.g., OneHotEncoding, Scaling)
+* Different ML Algorithms (e.g., Decision Trees, XGBoost)
+* Hyperparameter Tuning (e.g., Cross-Validation, Grid Search)
 
 ---
 
-## 📖 Getting Started
+## 📦 Environment Setup
 
-### 1. Setup Environment
+### 1. Build Your ML Environment
 
-Clone the repository and prepare your environment variables:
+This project bakes your code and dependencies into a Docker image so you don't have to install libraries at runtime.
 
 ```bash
+# Clone and enter the repo
 git clone https://github.com/iomete/iomete-ml-quickstart.git
 cd iomete-ml-quickstart
-cp .env.example .env
-
+mv .env.example .env
 ```
 
-*Edit `.env` to include your specific S3 bucket, file name and registry paths.*
+Update the `.env` file: 
 
-### 2. Build and Push the Image
+```txt
+# ---- Data ----
+MY_BUCKET=... # S3-compatible bucket name where your data is stored
+MY_CSV_FILE=... # path to your csv file in the bucket
 
-We use a custom Dockerfile that optimizes the Spark environment. Run the following command to build and push to your registry:
+# ---- Docker ----
+IMAGE=... # your docker image name
+TAG=... # your docker image tag
+REGISTRY=... # your docker registry URL
+```
 
-```bash
+Then, run:
+
+```
+# Build and push your custom ML image
 make docker-push
 ```
 
-## 🚀 Deploying to IOMETE
+### 2. Prepare Your Data
 
-Follow these steps to configure and launch your PySpark job on the IOMETE platform:
-
-### 1. Access the Console
-
-* Log in to your **IOMETE Console**.
-* Navigate to the **Job Templates** section in the sidebar.
-* Click on **New Job Template** to begin the setup.
-
-### 2. Configure the Job Template
-
-Fill in the template details in the following order:
-
-1. **Name:** Give your job a unique name (e.g., `spark-ml-job`).
-2. **Resource Bundle:** Select your preferred resource bundle from the dropdown.
-3. **Namespace:** Choose the appropriate namespace for your environment.
-4. **Job Type:** Select **Python** (ensure Java is not selected).
-5. **Docker Image:** Enter the URI of the image you pushed (e.g., `your-registry.azurecr.io/spark-ml:latest`).
-6. **Main Application File:** Set this to `local:///app/main.py`.
-> **Note:** The `local:///` prefix is required as it points to the file already baked into your custom image.
-
-
-7. **Compute:** Define your Driver/Executor CPU, Memory, and the number of nodes (e.g., 2 Executors).
-
-### 3. Execution & Monitoring
-
-* **Submit:** Click the submit button to initialize the job.
-* **Monitor:** Open the job logs and/or Spark UI to view the training progress. 
+Ensure your training data that is in an S3-compatible bucket is available in your IOMETE Lakehouse. OR, you can use the synthetic data generation logic included in `job.py` for testing purposes. You can also use testing data provided in `test_data` folder.
 
 ---
 
-## 📁 Repository Structure
+## 🚀 Running the ML Job on IOMETE
 
-* `main.py`: The PySpark ML training script.
-* `Dockerfile`: Using `uv` and virtual environments.
-* `requirements.txt`: Python dependencies (Numpy, Pandas, etc.).
-* `Makefile`: Shortcuts for Docker operations.
+Running ML training job can be submitted just like any other Spark job on IOMETE. Follow the steps described in the [IOMETE Spark Job Documentation](https://iomete.com/resources/developer-guide/spark-job/getting-started/) to create and submit a new Spark job. Note that you have at least two options when it comes to declaring your `Main application file` on IOMETE console:
+
+1. **Directly in Docker Image:** Include your `job.py` in the Docker image itself. In this case, set the `Main application file` to `local:///app/job.py` when creating the Spark job in IOMETE. 
+2. **Upload to S3:** Upload your `job.py` to your S3 bucket and set the `Main application file` to `s3a://<YOUR_BUCKET>/path/to/job.py`.
+
+### Recommended Compute for ML
+
+Training is memory-intensive but ofcourse distributed among multiple executors.
+
+For this ML template, we recommend:
+
+* **Driver:** 1 CPU / 1GB RAM (Handles the iterative coordination)
+* **Executors:** 2+ Nodes (2 CPU / 8GB RAM each) to allow Spark to cache the training dataset in memory.
+
+---
+
+## 📂 Project Structure
+
+| File | Description |
+| --- | --- |
+| **`job.py`** | **The ML Core.** Contains the SparkSession and model training logic. |
+| `infra/Dockerfile` | Base IOMETE Spark Python environment with additional packages |
+| `infra/requirements.txt` | Define your libraries here. |
+| `Makefile` | Utilities for building/pushing your Docker container. |
+
+---
+
+## 📈 Monitoring Training
+
+Once the job is submitted, you can monitor the training progress in various ways, in real time:
+
+1. Open the **Spark UI** from the IOMETE console. This is familiar Spark UI that provides detailed insights into the job execution.
+2. Open the **Metrics** tab to monitor resource utilization (CPU, Memory) across executors as a Grafana dashboard.
+3. Check the **Logs** directly  on **IOMETE console** to view the training logs and any potential errors.

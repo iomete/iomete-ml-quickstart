@@ -1,5 +1,9 @@
 FROM iomete.azurecr.io/iomete/spark-py:3.5.5-latest
 
+# switch to app directory
+WORKDIR /app
+
+# reset to root to run installation tasks
 USER root
 
 # ultra fast venv tool, uv
@@ -18,17 +22,15 @@ ENV PYSPARK_PYTHON="/opt/venv/bin/python"
 ENV PYSPARK_DRIVER_PYTHON="/opt/venv/bin/python"
 
 # install python dependencies into the venv using requirements.txt
-COPY requirements.txt /tmp/requirements.txt
-RUN uv pip install --python /opt/venv/bin/python -r /tmp/requirements.txt
+COPY infra/requirements.txt ./
+RUN uv pip install --python /opt/venv/bin/python -r requirements.txt
 
-# ensure the spark user owns the venv so it can execute scripts
-RUN chown -R spark:spark /opt/venv
+# Copy the application files
+COPY job.py ./
 
-# switch to spark user
-USER spark
 
-# switch to app directory
-WORKDIR /app
+# Specify the User that the actual main process will run as
+ARG spark_uid=185
+RUN chown -R ${spark_uid}:${spark_uid} /opt/venv
+USER ${spark_uid}
 
-# use chown to ensure spark user owns the main.py file 
-COPY --chown=spark:spark main.py /app/main.py
