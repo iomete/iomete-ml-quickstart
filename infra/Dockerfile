@@ -1,4 +1,4 @@
-FROM iomete.azurecr.io/iomete/spark-py:3.5.5-latest
+FROM iomete.azurecr.io/iomete/spark-py:3.5.7-latest
 
 # switch to app directory
 WORKDIR /app
